@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "914953000657",
+    "project_id": "spac-cc855",
+    "storage_bucket": "spac-cc855.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:914953000657:android:fe4e422c4fcbd16afe57f0",
+        "android_client_info": {
+          "package_name": "com.example.spac"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "914953000657-2jahhlp3rri3pe4ets54dp3n748pmbg7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAh0TEPE45tE1x6zLbVi8DW9qjSffBybU8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "914953000657-2jahhlp3rri3pe4ets54dp3n748pmbg7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
