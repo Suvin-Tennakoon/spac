@@ -79,7 +79,7 @@ class _ChoiceTypeState extends State<ChoiceType> {
             Padding(
               padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
               child: Text(
-                "Select Auction Type",
+                "Proceed Auctioning",
                 style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
               ),
             ),
@@ -98,7 +98,7 @@ class _ChoiceTypeState extends State<ChoiceType> {
                   bottom: MediaQuery.of(context).padding.bottom + 16),
               child: InkWell(
                 onTap: () {
-                  Navigator.pushReplacement(context,
+                  Navigator.push(context,
                       MaterialPageRoute(builder: (context) => AddItem()));
                 },
                 child: Container(

@@ -1,10 +1,14 @@
 import 'dart:io';
-
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart';
 
+//this is the base widget
+//it applies the theme for the inner components
 class AddItem extends StatelessWidget {
   const AddItem({super.key});
 
@@ -21,7 +25,7 @@ class AddItem extends StatelessWidget {
       ),
       builder: (context, child) {
         return FormThemeProvider(
-          theme: FormTheme(
+          theme: const FormTheme(
             checkboxTheme: CheckboxFieldTheme(
               canTapItemTile: true,
             ),
@@ -32,90 +36,95 @@ class AddItem extends StatelessWidget {
           child: child!,
         );
       },
-      home: Scaffold(backgroundColor: Colors.red, body: AllFieldsForm()),
+      home: AllFieldsForm(),
     );
   }
 }
 
+//added dependency:form_bloc class to handle user inputs
 class AllFieldsFormBloc extends FormBloc<String, String> {
-  final text1 = TextFieldBloc();
-
-  final boolean1 = BooleanFieldBloc();
-
-  final boolean2 = BooleanFieldBloc();
-
-  final select1 = SelectFieldBloc(
-    items: ['Option 1', 'Option 2'],
-    validators: [FieldBlocValidators.required],
-  );
-
-  final select2 = SelectFieldBloc(
-    items: ['Option 1', 'Option 2'],
-    validators: [FieldBlocValidators.required],
-  );
+  //handling other input fields
+  final subject = TextFieldBloc();
+  final tempitem = TextFieldBloc();
+  final description = TextFieldBloc();
+  final startprice = TextFieldBloc();
+  final buyoutprice = TextFieldBloc();
+  final contactno = TextFieldBloc();
 
   final multiSelect1 = MultiSelectFieldBloc<String, dynamic>(
-    items: [
-      'Option 1',
-      'Option 2',
-      'Option 3',
-      'Option 4',
-      'Option 5',
-    ],
+    items: [],
   );
-  final file = InputFieldBloc<File?, String>(initialValue: null);
-
-  final date1 = InputFieldBloc<DateTime?, Object>(initialValue: null);
-
   final dateAndTime1 = InputFieldBloc<DateTime?, Object>(initialValue: null);
-
-  final time1 = InputFieldBloc<TimeOfDay?, Object>(initialValue: null);
-
-  final double1 = InputFieldBloc<double, dynamic>(
-    initialValue: 0.5,
-  );
 
   AllFieldsFormBloc() : super(autoValidate: false) {
     addFieldBlocs(fieldBlocs: [
-      text1,
-      boolean1,
-      boolean2,
-      select1,
-      select2,
-      multiSelect1,
-      date1,
-      dateAndTime1,
-      time1,
-      double1,
+      subject,
+      tempitem,
+      description,
+      startprice,
+      buyoutprice,
+      contactno,
     ]);
   }
 
   void addErrors() {
-    text1.addFieldError('Awesome Error!');
-    boolean1.addFieldError('Awesome Error!');
-    boolean2.addFieldError('Awesome Error!');
-    select1.addFieldError('Awesome Error!');
-    select2.addFieldError('Awesome Error!');
-    multiSelect1.addFieldError('Awesome Error!');
-    date1.addFieldError('Awesome Error!');
-    dateAndTime1.addFieldError('Awesome Error!');
-    time1.addFieldError('Awesome Error!');
+    subject.addFieldError('Invalid Input!');
+    tempitem.addFieldError('Invalid Input!');
+    description.addFieldError('Invalid Input!');
+    startprice.addFieldError('Invalid Input!');
+    buyoutprice.addFieldError('Invalid Input!');
+    contactno.addFieldError('Invalid Input!');
   }
 
   @override
   void onSubmitting() async {
-    try {
-      await Future<void>.delayed(const Duration(milliseconds: 500));
-
-      emitSuccess(canSubmitAgain: true);
-    } catch (e) {
-      emitFailure();
-    }
+    // print(subject);
   }
 }
 
-class AllFieldsForm extends StatelessWidget {
+//main widget with form fields and image handling
+class AllFieldsForm extends StatefulWidget {
   const AllFieldsForm({Key? key}) : super(key: key);
+
+  @override
+  State<AllFieldsForm> createState() => _AllFieldsFormState();
+}
+
+class _AllFieldsFormState extends State<AllFieldsForm> {
+  //start - states to handle images
+  List<XFile>? _imageFileList;
+
+  void _setImageFileListFromFile(XFile? value) {
+    _imageFileList = value == null ? null : <XFile>[value];
+  }
+
+  dynamic _pickImageError;
+
+  final ImagePicker _picker = ImagePicker();
+
+  String? _retrieveDataError;
+
+  //image uploading function
+  Future uploadImageToFirebase(BuildContext context) async {
+    _imageFileList!.forEach((element) async {
+      //take file name
+      String fileName = basename(element.path);
+      FirebaseStorage storage = FirebaseStorage.instance;
+
+      //set file path to be uploaded
+      Reference ref = storage.ref().child('uploads/$fileName');
+      //get file path using 'path' dependency
+      File file = File(element.path);
+
+      //StorageReference class has been removed since firebase_storage 5.0.1
+      //use UploadTask instead
+      UploadTask uploadTask = ref.putFile(file);
+      uploadTask.then((res) {
+        res.ref.getDownloadURL().then((value) => print(value));
+      });
+    });
+  }
+  //end
 
   @override
   Widget build(BuildContext context) {
@@ -126,17 +135,24 @@ class AllFieldsForm extends StatelessWidget {
           final formBloc = BlocProvider.of<AllFieldsFormBloc>(context);
 
           return Scaffold(
-            appBar: AppBar(title: const Text('Built-in Widgets')),
+            backgroundColor: const Color(0xffF7EBE1),
+            appBar: AppBar(
+                title: Row(
+                  children: [
+                    IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(
+                          Icons.arrow_back_outlined,
+                        )),
+
+                    SizedBox(width: 20), // Add spacing between icon and text
+                    Text('Auction a Property'),
+                  ],
+                ),
+                backgroundColor: Color(0xff132137)),
             floatingActionButton: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                FloatingActionButton.extended(
-                  heroTag: null,
-                  onPressed: formBloc.addErrors,
-                  icon: const Icon(Icons.error_outline),
-                  label: const Text('ADD ERRORS'),
-                ),
-                const SizedBox(height: 12),
                 FloatingActionButton.extended(
                   heroTag: null,
                   onPressed: formBloc.submit,
@@ -145,70 +161,182 @@ class AllFieldsForm extends StatelessWidget {
                 ),
               ],
             ),
+
+            //submit button
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerDocked,
             body: FormBlocListener<AllFieldsFormBloc, String, String>(
               onSubmitting: (context, state) {
-                LoadingDialog.show(context);
-              },
-              onSuccess: (context, state) {
-                LoadingDialog.hide(context);
-
-                Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (_) => const SuccessScreen()));
-              },
-              onFailure: (context, state) {
-                LoadingDialog.hide(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(state.failureResponse!)));
+                uploadImageToFirebase(context);
               },
               child: ScrollableFormBlocManager(
                 formBloc: formBloc,
                 child: SingleChildScrollView(
                   physics: const ClampingScrollPhysics(),
-                  padding: const EdgeInsets.all(24.0),
+                  padding: const EdgeInsets.all(34.0),
                   child: Column(
                     children: <Widget>[
+                      //text input 1 start
+                      Row(
+                        children: const [
+                          Padding(
+                            padding: EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              "This will be displayed as the topic for the advertisement.",
+                              style: TextStyle(
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                       TextFieldBlocBuilder(
-                        textFieldBloc: formBloc.text1,
-                        suffixButton: SuffixButton.obscureText,
+                        textFieldBloc: formBloc.subject,
                         decoration: const InputDecoration(
-                          labelText: 'TextFieldBlocBuilder',
-                          prefixIcon: Icon(Icons.text_fields),
+                          labelText: 'Subject',
+                          prefixIcon: Icon(Icons.abc),
                         ),
                       ),
-                      RadioButtonGroupFieldBlocBuilder<String>(
-                        selectFieldBloc: formBloc.select2,
-                        decoration: const InputDecoration(
-                          labelText: 'RadioButtonGroupFieldBlocBuilder',
-                        ),
-                        groupStyle: const FlexGroupStyle(),
-                        itemBuilder: (context, item) => FieldItem(
-                          child: Text(item),
-                        ),
+                      const SizedBox(
+                        height: 20,
                       ),
-                      CheckboxGroupFieldBlocBuilder<String>(
+                      //text input 1 end
+
+                      //text input 2 start
+                      Row(
+                        children: const [
+                          Padding(
+                            padding: EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              "Add all of the items you wish you auction.",
+                              style: TextStyle(
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFieldBlocBuilder(
+                              textFieldBloc: formBloc.tempitem,
+                              decoration: const InputDecoration(
+                                labelText: 'Auction Item/Items',
+                                prefixIcon: Icon(Icons.sell),
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                              onPressed: () => {
+                                    formBloc.multiSelect1
+                                        .addItem(formBloc.tempitem.value)
+                                  },
+                              icon: const Icon(Icons.add))
+                        ],
+                      ),
+                      FilterChipFieldBlocBuilder<String>(
                         multiSelectFieldBloc: formBloc.multiSelect1,
-                        decoration: const InputDecoration(
-                          labelText: 'CheckboxGroupFieldBlocBuilder',
-                        ),
-                        groupStyle: const ListGroupStyle(
-                          scrollDirection: Axis.horizontal,
-                          height: 64,
-                        ),
-                        itemBuilder: (context, item) => FieldItem(
-                          child: Text(item),
+                        itemBuilder: (context, value) => ChipFieldItem(
+                          label: Text(value),
                         ),
                       ),
-                      DateTimeFieldBlocBuilder(
-                        dateTimeFieldBloc: formBloc.date1,
-                        format: DateFormat('dd-MM-yyyy'),
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(1900),
-                        lastDate: DateTime(2100),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      //text input 2 end
+
+                      //text input 3 start
+                      Row(
+                        children: const [
+                          Padding(
+                            padding: EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              "Add a great description, Good description = Good offers",
+                              style: TextStyle(
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      TextFieldBlocBuilder(
+                        textFieldBloc: formBloc.description,
+                        keyboardType: TextInputType.multiline,
+                        minLines: 3,
+                        maxLines: null,
                         decoration: const InputDecoration(
-                          labelText: 'DateTimeFieldBlocBuilder',
-                          prefixIcon: Icon(Icons.calendar_today),
-                          helperText: 'Date',
+                          labelText: 'Description',
+                          prefixIcon: Icon(Icons.description),
                         ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      //text input 3 end
+
+                      //text input 4.1 start
+                      Row(
+                        children: const [
+                          Padding(
+                            padding: EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              "Add a starting price and buyout price for auctioning items",
+                              style: TextStyle(
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFieldBlocBuilder(
+                              textFieldBloc: formBloc.startprice,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                labelText: 'Starting Price',
+                                prefixIcon: Icon(Icons.attach_money),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          //text input 4.1 end
+
+                          //text input 4.2 start
+                          Expanded(
+                            child: TextFieldBlocBuilder(
+                              textFieldBloc: formBloc.buyoutprice,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                labelText: 'Buyout Price',
+                                prefixIcon: Icon(Icons.attach_money),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      //text input 4.2 end
+
+                      //text input 5 start
+                      Row(
+                        children: const [
+                          Padding(
+                            padding: EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              "Set date and time to auction termination.",
+                              style: TextStyle(
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       DateTimeFieldBlocBuilder(
                         dateTimeFieldBloc: formBloc.dateAndTime1,
@@ -218,96 +346,142 @@ class AllFieldsForm extends StatelessWidget {
                         firstDate: DateTime(1900),
                         lastDate: DateTime(2100),
                         decoration: const InputDecoration(
-                          labelText: 'DateTimeFieldBlocBuilder',
+                          labelText: 'Exp. Date and Time',
                           prefixIcon: Icon(Icons.date_range),
-                          helperText: 'Date and Time',
                         ),
                       ),
-                      TimeFieldBlocBuilder(
-                        timeFieldBloc: formBloc.time1,
-                        format: DateFormat('hh:mm a'),
-                        initialTime: TimeOfDay.now(),
-                        decoration: const InputDecoration(
-                          labelText: 'TimeFieldBlocBuilder',
-                          prefixIcon: Icon(Icons.access_time),
-                        ),
+                      const SizedBox(
+                        height: 20,
                       ),
-                      SwitchFieldBlocBuilder(
-                        booleanFieldBloc: formBloc.boolean2,
-                        body: const Text('SwitchFieldBlocBuilder'),
-                      ),
-                      DropdownFieldBlocBuilder<String>(
-                        selectFieldBloc: formBloc.select1,
-                        decoration: const InputDecoration(
-                          labelText: 'DropdownFieldBlocBuilder',
-                        ),
-                        itemBuilder: (context, value) => FieldItem(
-                          isEnabled: value != 'Option 1',
-                          child: Text(value),
-                        ),
-                      ),
+                      //text input 5 end
+
+                      //text input 6 start
                       Row(
-                        children: [
-                          IconButton(
-                            onPressed: () => formBloc.addFieldBloc(
-                                fieldBloc: formBloc.select1),
-                            icon: const Icon(Icons.add),
-                          ),
-                          IconButton(
-                            onPressed: () => formBloc.removeFieldBloc(
-                                fieldBloc: formBloc.select1),
-                            icon: const Icon(Icons.delete),
+                        children: const [
+                          Padding(
+                            padding: EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              "Enter contact person's mobile number.",
+                              style: TextStyle(
+                                fontSize: 10,
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                      CheckboxFieldBlocBuilder(
-                        booleanFieldBloc: formBloc.boolean1,
-                        body: const Text('CheckboxFieldBlocBuilder'),
-                      ),
-                      CheckboxFieldBlocBuilder(
-                        booleanFieldBloc: formBloc.boolean1,
-                        body: const Text('CheckboxFieldBlocBuilder trailing'),
-                        controlAffinity:
-                            FieldBlocBuilderControlAffinity.trailing,
-                      ),
-                      SliderFieldBlocBuilder(
-                        inputFieldBloc: formBloc.double1,
-                        divisions: 10,
-                        labelBuilder: (context, value) =>
-                            value.toStringAsFixed(2),
-                      ),
-                      SliderFieldBlocBuilder(
-                        inputFieldBloc: formBloc.double1,
-                        divisions: 10,
-                        labelBuilder: (context, value) =>
-                            value.toStringAsFixed(2),
-                        activeColor: Colors.red,
-                        inactiveColor: Colors.green,
-                      ),
-                      SliderFieldBlocBuilder(
-                        inputFieldBloc: formBloc.double1,
-                        divisions: 10,
-                        labelBuilder: (context, value) =>
-                            value.toStringAsFixed(2),
-                      ),
-                      ChoiceChipFieldBlocBuilder<String>(
-                        selectFieldBloc: formBloc.select2,
-                        itemBuilder: (context, value) => ChipFieldItem(
-                          label: Text(value),
+                      TextFieldBlocBuilder(
+                        textFieldBloc: formBloc.contactno,
+                        keyboardType: TextInputType.phone,
+                        decoration: const InputDecoration(
+                          labelText: 'Contact Number',
+                          prefixIcon: Icon(Icons.add_call),
                         ),
                       ),
-                      FilterChipFieldBlocBuilder<String>(
-                        multiSelectFieldBloc: formBloc.multiSelect1,
-                        itemBuilder: (context, value) => ChipFieldItem(
-                          label: Text(value),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      //text input 6 end
+
+                      //text input 7 start
+                      //this is the image part
+                      Row(
+                        children: const [
+                          Padding(
+                            padding: EdgeInsets.only(left: 8.0, bottom: 8.0),
+                            child: Text(
+                              "Add one/more images of the auctioning item(s).",
+                              style: TextStyle(
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(20.0),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Color.fromARGB(255, 114, 110, 110),
+                            width: 0.7,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+
+                        //image upload buttons - 2 buttons for upload images from gallery and
+                        // take a picture and upload it through camera
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                FloatingActionButton(
+                                  tooltip: 'Pick Multiple Images from gallery',
+                                  heroTag: 'image1',
+                                  onPressed: () {
+                                    _onImageButtonPressed(
+                                      ImageSource.gallery,
+                                      context: context,
+                                      isMultiImage: true,
+                                    );
+                                  },
+                                  child: const Icon(Icons.collections),
+                                ),
+                                FloatingActionButton(
+                                  onPressed: () {
+                                    _onImageButtonPressed(ImageSource.camera,
+                                        context: context);
+                                  },
+                                  tooltip: 'Take a Photo',
+                                  heroTag: 'image2',
+                                  child: const Icon(Icons.add_a_photo),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 30,
+                            ),
+
+                            //this widget will display the selected image(s) previews
+                            //may not work in operating systems other than android.
+                            Center(
+                              child: !kIsWeb &&
+                                      defaultTargetPlatform !=
+                                          TargetPlatform.android
+                                  ? FutureBuilder<void>(
+                                      builder: (BuildContext context,
+                                          AsyncSnapshot<void> snapshot) {
+                                        switch (snapshot.connectionState) {
+                                          case ConnectionState.none:
+                                          case ConnectionState.waiting:
+                                            return const Text(
+                                              'You have not yet picked an image.',
+                                              textAlign: TextAlign.center,
+                                            );
+                                          case ConnectionState.done:
+                                            return _previewImages();
+                                          case ConnectionState.active:
+                                            if (snapshot.hasError) {
+                                              return Text(
+                                                'Pick image/video error: ${snapshot.error}}',
+                                                textAlign: TextAlign.center,
+                                              );
+                                            } else {
+                                              return const Text(
+                                                'You have not yet picked an image.',
+                                                textAlign: TextAlign.center,
+                                              );
+                                            }
+                                        }
+                                      },
+                                    )
+                                  : _previewImages(),
+                            ),
+                          ],
                         ),
                       ),
-                      BlocBuilder<InputFieldBloc<File?, String>,
-                              InputFieldBlocState<File?, String>>(
-                          bloc: formBloc.file,
-                          builder: (context, state) {
-                            return Container();
-                          })
+                      const SizedBox(
+                        height: 40.0,
+                      )
                     ],
                   ),
                 ),
@@ -318,65 +492,135 @@ class AllFieldsForm extends StatelessWidget {
       ),
     );
   }
-}
 
-class LoadingDialog extends StatelessWidget {
-  static void show(BuildContext context, {Key? key}) => showDialog<void>(
+//invoked when image upload request initialized
+  Future<void> _onImageButtonPressed(ImageSource source,
+      {BuildContext? context, bool isMultiImage = false}) async {
+    if (isMultiImage) {
+      //executed if selected from gallery
+      await _displayPickImageDialog(context!,
+          (double? maxWidth, double? maxHeight, int? quality) async {
+        try {
+          final List<XFile> pickedFileList = await _picker.pickMultiImage(
+            maxWidth: maxWidth,
+            maxHeight: maxHeight,
+            imageQuality: quality,
+          );
+          setState(() {
+            _imageFileList = pickedFileList;
+          });
+        } catch (e) {
+          setState(() {
+            _pickImageError = e;
+          });
+        }
+      });
+    } else {
+      //executed if selected from camera
+      await _displayPickImageDialog(context!,
+          (double? maxWidth, double? maxHeight, int? quality) async {
+        try {
+          //width and height are set to low values,
+          //otherwise the camera image size would be huge and
+          //may take lot of resources.
+          final XFile? pickedFile = await _picker.pickImage(
+            source: source,
+            maxWidth: 640,
+            maxHeight: 480,
+            imageQuality: quality,
+          );
+          setState(() {
+            _setImageFileListFromFile(pickedFile);
+          });
+        } catch (e) {
+          setState(() {
+            _pickImageError = e;
+          });
+        }
+      });
+    }
+  }
+
+//preview image widget start
+  Widget _previewImages() {
+    final Text? retrieveError = _getRetrieveErrorWidget();
+    if (retrieveError != null) {
+      return retrieveError;
+    }
+    if (_imageFileList != null) {
+      print(_imageFileList![0].path);
+      return Semantics(
+        label: 'image_picker_example_picked_images',
+        child: ListView.builder(
+          shrinkWrap: true,
+          key: UniqueKey(),
+          itemBuilder: (BuildContext context, int index) {
+            // Why network for web?
+            // See https://pub.dev/packages/image_picker#getting-ready-for-the-web-platform
+            return Semantics(
+              label: 'image_picker_example_picked_image',
+              child: kIsWeb
+                  ? Image.network(_imageFileList![index].path)
+                  : Image.file(File(_imageFileList![index].path)),
+            );
+          },
+          itemCount: _imageFileList!.length,
+        ),
+      );
+    } else if (_pickImageError != null) {
+      return Text(
+        'Pick image error: $_pickImageError',
+        textAlign: TextAlign.center,
+      );
+    } else {
+      return const Text(
+        'You have not yet picked an image.',
+        textAlign: TextAlign.center,
+      );
+    }
+  }
+//preview image widget end
+
+//error handling in image uploading
+  Text? _getRetrieveErrorWidget() {
+    if (_retrieveDataError != null) {
+      final Text result = Text(_retrieveDataError!);
+      _retrieveDataError = null;
+      return result;
+    }
+    return null;
+  }
+
+//displaypickimagedialog has been altered to simplify the application
+  Future<void> _displayPickImageDialog(
+      BuildContext context, OnPickImageCallback onPick) async {
+    return showDialog(
         context: context,
-        useRootNavigator: false,
-        barrierDismissible: false,
-        builder: (_) => LoadingDialog(key: key),
-      ).then((_) => FocusScope.of(context).requestFocus(FocusNode()));
-
-  static void hide(BuildContext context) => Navigator.pop(context);
-
-  const LoadingDialog({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Center(
-        child: Card(
-          child: Container(
-            width: 80,
-            height: 80,
-            padding: const EdgeInsets.all(12.0),
-            child: const CircularProgressIndicator(),
-          ),
-        ),
-      ),
-    );
+        builder: (BuildContext context) {
+          final double? width = null;
+          final double? height = null;
+          final int? quality = null;
+          onPick(width, height, quality);
+          Navigator.of(context).pop();
+          return Container();
+        });
   }
 }
 
-class SuccessScreen extends StatelessWidget {
-  const SuccessScreen({Key? key}) : super(key: key);
+typedef OnPickImageCallback = void Function(
+    double? maxWidth, double? maxHeight, int? quality);
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Icon(Icons.tag_faces, size: 100),
-            const SizedBox(height: 10),
-            const Text(
-              'Success',
-              style: TextStyle(fontSize: 54, color: Colors.black),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton.icon(
-              onPressed: () => Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (_) => const AllFieldsForm())),
-              icon: const Icon(Icons.replay),
-              label: const Text('AGAIN'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+@override
+void initState() {
+  initState();
+}
+
+@override
+void dispose() {
+  dispose();
+}
+
+@override
+Widget build(BuildContext context) {
+  return Container();
 }
