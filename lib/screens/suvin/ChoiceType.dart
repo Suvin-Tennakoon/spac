@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:spac/screens/suvin/AddItem.dart';
 
 class IntroductionAnimationScreen extends StatefulWidget {
+  
   const IntroductionAnimationScreen({Key? key}) : super(key: key);
 
   @override
@@ -99,7 +100,8 @@ class _ChoiceTypeState extends State<ChoiceType> {
               child: InkWell(
                 onTap: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => AddItem()));
+                      MaterialPageRoute(
+                          builder: (context) => AddItem(userdata: "Suvin")));
                 },
                 child: Container(
                   height: 58,

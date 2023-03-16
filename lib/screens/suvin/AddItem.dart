@@ -6,11 +6,13 @@ import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart';
+import 'package:spac/screens/suvin/validator.dart';
 
 //this is the base widget
 //it applies the theme for the inner components
 class AddItem extends StatelessWidget {
-  const AddItem({super.key});
+  final String userdata;
+  const AddItem({super.key, required this.userdata});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +38,7 @@ class AddItem extends StatelessWidget {
           child: child!,
         );
       },
-      home: AllFieldsForm(),
+      home: AllFieldsForm(userdata: userdata),
     );
   }
 }
@@ -64,27 +66,19 @@ class AllFieldsFormBloc extends FormBloc<String, String> {
       startprice,
       buyoutprice,
       contactno,
+      dateAndTime1,
+      multiSelect1
     ]);
   }
 
-  void addErrors() {
-    subject.addFieldError('Invalid Input!');
-    tempitem.addFieldError('Invalid Input!');
-    description.addFieldError('Invalid Input!');
-    startprice.addFieldError('Invalid Input!');
-    buyoutprice.addFieldError('Invalid Input!');
-    contactno.addFieldError('Invalid Input!');
-  }
-
   @override
-  void onSubmitting() async {
-    // print(subject);
-  }
+  void onSubmitting() async {}
 }
 
 //main widget with form fields and image handling
 class AllFieldsForm extends StatefulWidget {
-  const AllFieldsForm({Key? key}) : super(key: key);
+  final String userdata;
+  const AllFieldsForm({Key? key, required this.userdata}) : super(key: key);
 
   @override
   State<AllFieldsForm> createState() => _AllFieldsFormState();
@@ -105,8 +99,13 @@ class _AllFieldsFormState extends State<AllFieldsForm> {
   String? _retrieveDataError;
 
   //image uploading function
-  Future uploadImageToFirebase(BuildContext context) async {
-    _imageFileList!.forEach((element) async {
+  Future uploadImageToFirebase(
+      BuildContext context, AllFieldsFormBloc formBloc) async {
+    LoadingDialog.show(context);
+
+    List<String> imageUrls = [];
+
+    await Future.wait(_imageFileList!.map((element) async {
       //take file name
       String fileName = basename(element.path);
       FirebaseStorage storage = FirebaseStorage.instance;
@@ -119,11 +118,19 @@ class _AllFieldsFormState extends State<AllFieldsForm> {
       //StorageReference class has been removed since firebase_storage 5.0.1
       //use UploadTask instead
       UploadTask uploadTask = ref.putFile(file);
-      uploadTask.then((res) {
-        res.ref.getDownloadURL().then((value) => print(value));
+
+      return await uploadTask.then((res) async {
+        String downloadUrl = await res.ref.getDownloadURL();
+        imageUrls.add(downloadUrl);
       });
-    });
+    }));
+
+    LoadingDialog.hide(context);
+
+    // All uploads completed, do something with the image URLs
+    print(imageUrls);
   }
+
   //end
 
   @override
@@ -167,7 +174,35 @@ class _AllFieldsFormState extends State<AllFieldsForm> {
                 FloatingActionButtonLocation.centerDocked,
             body: FormBlocListener<AllFieldsFormBloc, String, String>(
               onSubmitting: (context, state) {
-                uploadImageToFirebase(context);
+                if (formBloc.subject.value == "") {
+                  formBloc.subject
+                      .addFieldError("Must enter a subject to continue");
+                } else if (formBloc.multiSelect1.value.isEmpty) {
+                  formBloc.multiSelect1
+                      .addFieldError("Enter atleast one item to continue");
+                  formBloc.tempitem
+                      .addFieldError("Enter atleast one item to continue");
+                } else if (formBloc.description.value == "") {
+                  formBloc.description.addFieldError("Enter a description");
+                } else if (formBloc.startprice.value == "") {
+                  formBloc.startprice.addFieldError("Enter a starting price");
+                } else if (formBloc.buyoutprice.value == "") {
+                  formBloc.buyoutprice.addFieldError("Enter a buyout price");
+                } else if (formBloc.dateAndTime1.value == null) {
+                  formBloc.dateAndTime1
+                      .addFieldError("Enter auction closing date and time");
+                } else if (formBloc.contactno.value == "") {
+                  formBloc.contactno.addFieldError("Enter a contact number");
+                } else if (formBloc.contactno.value.length < 10) {
+                  formBloc.contactno
+                      .addFieldError("Enter a valid contact number");
+                } else if (_imageFileList == null || _imageFileList!.isEmpty) {
+                  setState(() {
+                    _retrieveDataError = "Add atleast one image";
+                  });
+                } else {
+                  uploadImageToFirebase(context, formBloc);
+                }
               },
               child: ScrollableFormBlocManager(
                 formBloc: formBloc,
@@ -176,6 +211,14 @@ class _AllFieldsFormState extends State<AllFieldsForm> {
                   padding: const EdgeInsets.all(34.0),
                   child: Column(
                     children: <Widget>[
+                      Text(
+                        "Hello, ${widget.userdata} !!",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+
                       //text input 1 start
                       Row(
                         children: const [
@@ -228,11 +271,30 @@ class _AllFieldsFormState extends State<AllFieldsForm> {
                             ),
                           ),
                           IconButton(
-                              onPressed: () => {
-                                    formBloc.multiSelect1
-                                        .addItem(formBloc.tempitem.value)
-                                  },
+                              onPressed: () {
+                                formBloc.multiSelect1
+                                    .addItem(formBloc.tempitem.value);
+                                formBloc.multiSelect1
+                                    .select(formBloc.tempitem.value);
+                              },
                               icon: const Icon(Icons.add))
+                        ],
+                      ),
+
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        children: const [
+                          Padding(
+                            padding: EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              "You can de-select items if you don't want it to be included.",
+                              style: TextStyle(
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                       FilterChipFieldBlocBuilder<String>(
@@ -401,8 +463,10 @@ class _AllFieldsFormState extends State<AllFieldsForm> {
                         padding: const EdgeInsets.all(20.0),
                         decoration: BoxDecoration(
                           border: Border.all(
-                            color: Color.fromARGB(255, 114, 110, 110),
-                            width: 0.7,
+                            color: _retrieveDataError != null
+                                ? Colors.red
+                                : Color.fromARGB(255, 114, 110, 110),
+                            width: _retrieveDataError != null ? 2 : 0.7,
                           ),
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -623,4 +687,51 @@ void dispose() {
 @override
 Widget build(BuildContext context) {
   return Container();
+}
+
+class LoadingDialog extends StatelessWidget {
+  static void show(BuildContext context, {Key? key}) => showDialog<void>(
+        context: context,
+        useRootNavigator: false,
+        barrierDismissible: false,
+        builder: (_) => LoadingDialog(key: key),
+      ).then((_) => FocusScope.of(context).requestFocus(FocusNode()));
+
+  static void hide(BuildContext context) => Navigator.pop(context);
+
+  const LoadingDialog({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Center(
+        child: Card(
+          child: Container(
+            width: 150,
+            height: 130,
+            padding: const EdgeInsets.all(12.0),
+            child: Center(
+              child: Column(
+                children: const [
+                  CircularProgressIndicator(
+                    color: Colors.green,
+                  ),
+                  SizedBox(
+                    height: 15.0,
+                  ),
+                  Text(
+                    "Please Wait While We Construct Your Auction...",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.green),
+                    textAlign: TextAlign.center,
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
