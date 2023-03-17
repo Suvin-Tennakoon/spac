@@ -10,6 +10,11 @@ class AuctionItemRepository {
         snapshot.docs.map((doc) => AuctionItem.fromMap(doc)).toList());
   }
 
+  Future<List<AuctionItem>> getAllAuctionItems() async {
+    final snapshot = await _collectionReference.get();
+    return snapshot.docs.map((doc) => AuctionItem.fromMap(doc)).toList();
+  }
+
   Future<void> addAuctionItem(AuctionItem auctionItem) {
     return _collectionReference.add(auctionItem.toMap());
   }

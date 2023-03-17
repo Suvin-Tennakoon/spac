@@ -6,6 +6,9 @@ import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart';
+import 'package:spac/models/suvin/AuctionItem.model.dart';
+import 'package:spac/repositories/suvin/AuctionItem.repository.dart';
+import 'package:spac/screens/suvin/ViewItems.dart';
 import 'package:spac/screens/suvin/validator.dart';
 
 //this is the base widget
@@ -125,10 +128,30 @@ class _AllFieldsFormState extends State<AllFieldsForm> {
       });
     }));
 
+
+    // All uploads completed, send items to database with the image URLs
+    AuctionItem auctionItem = AuctionItem(
+        widget.userdata,
+        formBloc.subject.value,
+        formBloc.multiSelect1.value,
+        formBloc.description.value,
+        formBloc.contactno.value,
+        formBloc.startprice.value,
+        formBloc.buyoutprice.value,
+        formBloc.dateAndTime1.value,
+        imageUrls,
+        "",
+        double.parse(formBloc.startprice.value));
+
+    AuctionItemRepository repo = AuctionItemRepository();
+    repo.addAuctionItem(auctionItem);
+
     LoadingDialog.hide(context);
 
-    // All uploads completed, do something with the image URLs
-    print(imageUrls);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ViewAuctionItems(userdata: widget.userdata)));
   }
 
   //end
@@ -152,7 +175,7 @@ class _AllFieldsFormState extends State<AllFieldsForm> {
                           Icons.arrow_back_outlined,
                         )),
 
-                    SizedBox(width: 20), // Add spacing between icon and text
+                    SizedBox(width: 50), // Add spacing between icon and text
                     Text('Auction a Property'),
                   ],
                 ),

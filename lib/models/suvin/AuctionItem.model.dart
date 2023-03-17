@@ -3,13 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class AuctionItem {
   String sellermail;
   String subject;
-  List<String> items;
+  List<dynamic> items;
   String description;
   String contactno;
-  double startprice;
-  double buyoutprice;
-  DateTime expdatetime;
-  List<String> imageurls;
+  String startprice;
+  String buyoutprice;
+  dynamic expdatetime;
+  List<dynamic> imageurls;
   String biddermail;
   double currentbid;
 
