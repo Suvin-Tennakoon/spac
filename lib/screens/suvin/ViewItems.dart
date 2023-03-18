@@ -41,6 +41,20 @@ class _ViewAuctionItemsState extends State<ViewAuctionItems>
     super.dispose();
   }
 
+  Future<void> _refreshList() async {
+    setState(() {
+      _auctionItems = null; // Set to null to show loading indicator
+    });
+
+    AuctionItemRepository repo = AuctionItemRepository();
+    List<AuctionItem> items = await repo.getAllAuctionItems();
+
+    setState(() {
+      _auctionItems = items;
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,7 +132,7 @@ class _ViewAuctionItemsState extends State<ViewAuctionItems>
                                                           .fastOutSlowIn)));
                                       animationController?.forward();
                                       return AuctionListView(
-                                        callback: () {},
+                                        callback: _refreshList,
                                         auctionItem: _auctionItems?[index],
                                         animation: animation,
                                         animationController:
@@ -141,6 +155,7 @@ class _ViewAuctionItemsState extends State<ViewAuctionItems>
     );
   }
 }
+
 
 class LoadingDialog extends StatelessWidget {
   static void show(BuildContext context, {Key? key}) => showDialog<void>(

@@ -13,7 +13,7 @@ void main() async {
   );
 
   runApp(const MaterialApp(
-    home: IntroductionAnimationScreen(),
+    home: IntroductionAnimationScreen()
   ));
 }
 

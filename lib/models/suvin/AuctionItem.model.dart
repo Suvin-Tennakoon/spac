@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuctionItem {
+  String id;
   String sellermail;
   String subject;
   List<dynamic> items;
@@ -14,6 +15,7 @@ class AuctionItem {
   double currentbid;
 
   AuctionItem(
+      this.id,
       this.sellermail,
       this.subject,
       this.items,
@@ -44,6 +46,7 @@ class AuctionItem {
 
   factory AuctionItem.fromMap(DocumentSnapshot data) {
     return AuctionItem(
+        data.id,
         data['sellermail'],
         data['subject'],
         data['items'],

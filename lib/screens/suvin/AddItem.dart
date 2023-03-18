@@ -131,6 +131,7 @@ class _AllFieldsFormState extends State<AllFieldsForm> {
 
     // All uploads completed, send items to database with the image URLs
     AuctionItem auctionItem = AuctionItem(
+        "",
         widget.userdata,
         formBloc.subject.value,
         formBloc.multiSelect1.value,
