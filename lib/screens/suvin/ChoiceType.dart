@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:spac/screens/suvin/AddItem.dart';
 
 class IntroductionAnimationScreen extends StatefulWidget {
-  
-  const IntroductionAnimationScreen({Key? key}) : super(key: key);
+
+  final String userdata;
+
+  const IntroductionAnimationScreen({Key? key, required this.userdata})
+      : super(key: key);
 
   @override
   _IntroductionAnimationScreenState createState() =>
@@ -33,19 +36,23 @@ class _IntroductionAnimationScreenState
     return Scaffold(
       backgroundColor: Color(0xffF7EBE1),
       body: ClipRect(
-          child: Stack(children: [
-        ChoiceType(
-          animationController: _animationController!,
+        child: Center(
+          child: ChoiceType(
+              animationController: _animationController!,
+              userdata: widget.userdata
+          ),
         ),
-      ])),
+      ),
     );
   }
 }
 
 class ChoiceType extends StatefulWidget {
   final AnimationController animationController;
+  final String userdata;
 
-  const ChoiceType({Key? key, required this.animationController})
+  const ChoiceType(
+      {Key? key, required this.animationController, required this.userdata})
       : super(key: key);
 
   @override
@@ -69,6 +76,7 @@ class _ChoiceTypeState extends State<ChoiceType> {
       position: _introductionanimation,
       child: SingleChildScrollView(
         child: Column(
+          
           children: [
             SizedBox(
               width: MediaQuery.of(context).size.width,
@@ -77,21 +85,21 @@ class _ChoiceTypeState extends State<ChoiceType> {
                 fit: BoxFit.cover,
               ),
             ),
-            Padding(
+            const Padding(
               padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
               child: Text(
                 "Proceed Auctioning",
                 style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
               ),
             ),
-            Padding(
+            const Padding(
               padding: EdgeInsets.only(left: 64, right: 64),
               child: Text(
                 "An auction is not just a public sale of goods or services, it's a captivating performance where bidders engage in a thrilling dance with the auctioneer, their hearts beating fast, their minds racing with strategies, their eyes locked on the prize.",
                 textAlign: TextAlign.center,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 48,
             ),
             Padding(
@@ -101,7 +109,8 @@ class _ChoiceTypeState extends State<ChoiceType> {
                 onTap: () {
                   Navigator.push(context,
                       MaterialPageRoute(
-                          builder: (context) => AddItem(userdata: "Suvin")));
+                          builder: (context) =>
+                              AddItem(userdata: widget.userdata)));
                 },
                 child: Container(
                   height: 58,

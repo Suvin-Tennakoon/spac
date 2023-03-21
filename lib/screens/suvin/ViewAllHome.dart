@@ -3,20 +3,22 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:spac/models/suvin/AuctionItem.model.dart';
 import 'package:spac/repositories/suvin/AuctionItem.repository.dart';
+import 'package:spac/screens/suvin/ChoiceType.dart';
+import 'package:spac/screens/suvin/auc_list_all.dart';
 import 'package:spac/screens/suvin/auc_list_view.dart';
 import 'package:spac/screens/suvin/view_aucitem_theme.dart';
 
-
-//this widget will display auction items placed by individual people
-class ViewAuctionItems extends StatefulWidget {
-  final String userdata;
-  const ViewAuctionItems({super.key, required this.userdata});
+//this widget will display auction items placed by all the community
+class ViewAllAuctionItems extends StatefulWidget {
+  //need to change this to get authenticated mail of the user
+  final String userdata = "Suvin";
+  const ViewAllAuctionItems({super.key});
 
   @override
-  State<ViewAuctionItems> createState() => _ViewAuctionItemsState();
+  State<ViewAllAuctionItems> createState() => _ViewAllAuctionItemsState();
 }
 
-class _ViewAuctionItemsState extends State<ViewAuctionItems>
+class _ViewAllAuctionItemsState extends State<ViewAllAuctionItems>
     with TickerProviderStateMixin {
   AnimationController? animationController;
   List<AuctionItem>? _auctionItems;
@@ -29,7 +31,6 @@ class _ViewAuctionItemsState extends State<ViewAuctionItems>
 
     AuctionItemRepository repo = AuctionItemRepository();
     repo.getAllAuctionItems().then((value) {
-      print(value[0].sellermail);
       setState(() {
         _auctionItems = value;
       });
@@ -57,7 +58,6 @@ class _ViewAuctionItemsState extends State<ViewAuctionItems>
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,11 +65,36 @@ class _ViewAuctionItemsState extends State<ViewAuctionItems>
       appBar: AppBar(
           title: Row(
             children: const [
-              SizedBox(width: 60), // Add spacing between icon and text
-              Text('Placed Auctions'),
+              SizedBox(width: 100), // Add spacing between icon and text
+              Text('All Placed Auctions'),
             ],
           ),
           backgroundColor: Color(0xff132137)),
+
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            FloatingActionButton.extended(
+              heroTag: null,
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => IntroductionAnimationScreen(
+                            userdata: widget.userdata)));
+              },
+              icon: const Icon(Icons.sell),
+              label: const Text('PLACE AD'),
+            ),
+          ],
+        ),
+      ),
+
+      //submit button
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+
       body: Theme(
         data: AucItemTheme.buildLightTheme(),
         child: Container(
@@ -134,7 +159,7 @@ class _ViewAuctionItemsState extends State<ViewAuctionItems>
                                                       curve: Curves
                                                           .fastOutSlowIn)));
                                       animationController?.forward();
-                                      return AuctionListView(
+                                      return AuctionListAllView(
                                         callback: _refreshList,
                                         auctionItem: _auctionItems?[index],
                                         animation: animation,
@@ -158,7 +183,6 @@ class _ViewAuctionItemsState extends State<ViewAuctionItems>
     );
   }
 }
-
 
 class LoadingDialog extends StatelessWidget {
   static void show(BuildContext context, {Key? key}) => showDialog<void>(
@@ -192,7 +216,7 @@ class LoadingDialog extends StatelessWidget {
                     height: 15.0,
                   ),
                   Text(
-                    "Please Wait While We Fetch Your Auctions...",
+                    "Please Wait While We Fetch All Auctions...",
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.green),
                     textAlign: TextAlign.center,

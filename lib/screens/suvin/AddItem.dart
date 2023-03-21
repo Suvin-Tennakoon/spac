@@ -181,16 +181,19 @@ class _AllFieldsFormState extends State<AllFieldsForm> {
                   ],
                 ),
                 backgroundColor: Color(0xff132137)),
-            floatingActionButton: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                FloatingActionButton.extended(
-                  heroTag: null,
-                  onPressed: formBloc.submit,
-                  icon: const Icon(Icons.send),
-                  label: const Text('SUBMIT'),
-                ),
-              ],
+            floatingActionButton: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  FloatingActionButton.extended(
+                    heroTag: null,
+                    onPressed: formBloc.submit,
+                    icon: const Icon(Icons.send),
+                    label: const Text('SUBMIT'),
+                  ),
+                ],
+              ),
             ),
 
             //submit button

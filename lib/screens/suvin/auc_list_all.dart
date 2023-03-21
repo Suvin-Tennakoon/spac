@@ -5,10 +5,9 @@ import 'package:spac/repositories/suvin/AuctionItem.repository.dart';
 import 'package:spac/screens/suvin/view_aucitem_theme.dart';
 import 'package:flutter_countdown_timer/index.dart';
 
-
-//this widget will propogate the list of items by peoplewise
-class AuctionListView extends StatefulWidget {
-  const AuctionListView(
+//this widget will propogate the list of all items
+class AuctionListAllView extends StatefulWidget {
+  const AuctionListAllView(
       {Key? key,
       this.auctionItem,
       this.animationController,
@@ -22,10 +21,10 @@ class AuctionListView extends StatefulWidget {
   final Animation<double>? animation;
 
   @override
-  State<AuctionListView> createState() => _AuctionListViewState();
+  State<AuctionListAllView> createState() => _AuctionListAllViewState();
 }
 
-class _AuctionListViewState extends State<AuctionListView> {
+class _AuctionListAllViewState extends State<AuctionListAllView> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -41,7 +40,6 @@ class _AuctionListViewState extends State<AuctionListView> {
                   left: 24, right: 24, top: 8, bottom: 16),
               child: InkWell(
                 splashColor: Colors.transparent,
-                
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.all(Radius.circular(16.0)),
@@ -190,72 +188,8 @@ class _AuctionListViewState extends State<AuctionListView> {
                           ],
                         ),
                         Positioned(
-                          top: 15,
-                          right: 25,
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(32.0),
-                              ),
-                              onTap: () {
-                                showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) =>
-                                        AlertDialog(
-                                          title: const Text(
-                                              'Deletion Auction Item'),
-                                          content: const Text(
-                                              'Do You Really Want to Delete the Item? This Action Cannot be Reversed.'),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              onPressed: () => Navigator.pop(
-                                                  context, 'Cancel'),
-                                              child: const Text('Cancel'),
-                                            ),
-                                            TextButton(
-                                                onPressed: () async {
-                                                  LoadingDialog.show(context);
-                                                  for (String x in widget
-                                                      .auctionItem!.imageurls) {
-                                                    FirebaseStorage storage =
-                                                        FirebaseStorage
-                                                            .instance;
-                                                    Reference ref =
-                                                        storage.refFromURL(x);
-                                                    await ref.delete();
-                                                  }
-
-                                                  AuctionItemRepository repo =
-                                                      AuctionItemRepository();
-                                                  repo.deleteAuctionItem(
-                                                      widget.auctionItem!.id);
-
-                                                  LoadingDialog.hide(context);
-                                                  Navigator.pop(context);
-                                                  widget.callback();
-                                                },
-                                                child: const Text('OK')),
-                                          ],
-                                        ));
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20.0),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Icon(Icons.delete_forever,
-                                      size: 30, color: Colors.red),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 15,
-                          right: 85,
+                          left: 50,
+                          top: 140,
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
@@ -270,10 +204,56 @@ class _AuctionListViewState extends State<AuctionListView> {
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
-                                  child: Icon(
-                                    Icons.edit_square,
-                                    size: 30,
-                                    color: Colors.green,
+                                  child: Row(
+                                    children: const [
+                                      Text(
+                                        "Comment",
+                                        style: TextStyle(color: Colors.blue),
+                                      ),
+                                      SizedBox(
+                                        width: 10.0,
+                                      ),
+                                      Icon(
+                                        Icons.comment,
+                                        size: 20,
+                                        color: Colors.blue,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          right: 50,
+                          top: 140,
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(32.0),
+                              ),
+                              onTap: () {},
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20.0),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    children: const [
+                                      Icon(Icons.currency_exchange,
+                                          size: 20, color: Colors.blue),
+                                      SizedBox(
+                                        width: 10.0,
+                                      ),
+                                      Text(
+                                        "Place Bid",
+                                        style: TextStyle(color: Colors.blue),
+                                      )
+                                    ],
                                   ),
                                 ),
                               ),
@@ -292,7 +272,6 @@ class _AuctionListViewState extends State<AuctionListView> {
     );
   }
 }
-
 
 class LoadingDialog extends StatelessWidget {
   static void show(BuildContext context, {Key? key}) => showDialog<void>(
