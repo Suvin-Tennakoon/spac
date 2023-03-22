@@ -2,7 +2,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:spac/models/suvin/AuctionItem.model.dart';
 import 'package:spac/repositories/suvin/AuctionItem.repository.dart';
-import 'package:spac/screens/suvin/view_aucitem_theme.dart';
 import 'package:flutter_countdown_timer/index.dart';
 
 //this widget will propogate the list of all items

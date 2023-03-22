@@ -4,7 +4,6 @@ import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:spac/models/suvin/AuctionItem.model.dart';
 import 'package:spac/repositories/suvin/AuctionItem.repository.dart';
 import 'package:spac/screens/suvin/auc_list_view.dart';
-import 'package:spac/screens/suvin/view_aucitem_theme.dart';
 
 
 //this widget will display auction items placed by individual people
@@ -29,9 +28,16 @@ class _ViewAuctionItemsState extends State<ViewAuctionItems>
 
     AuctionItemRepository repo = AuctionItemRepository();
     repo.getAllAuctionItems().then((value) {
-      print(value[0].sellermail);
+
+      List<AuctionItem> localitems = [];
+
+      for (AuctionItem ai in value) {
+        if (ai.sellermail == widget.userdata) {
+          localitems.add(ai);
+        }
+      }
       setState(() {
-        _auctionItems = value;
+        _auctionItems = localitems;
       });
     });
 
@@ -52,6 +58,14 @@ class _ViewAuctionItemsState extends State<ViewAuctionItems>
     AuctionItemRepository repo = AuctionItemRepository();
     List<AuctionItem> items = await repo.getAllAuctionItems();
 
+    List<AuctionItem> localitems = [];
+
+    for (AuctionItem ai in items) {
+      if (ai.sellermail == widget.userdata) {
+        localitems.add(ai);
+      }
+    }
+
     setState(() {
       _auctionItems = items;
     });
@@ -70,9 +84,7 @@ class _ViewAuctionItemsState extends State<ViewAuctionItems>
             ],
           ),
           backgroundColor: Color(0xff132137)),
-      body: Theme(
-        data: AucItemTheme.buildLightTheme(),
-        child: Container(
+      body: Container(
           child: Scaffold(
             body: _auctionItems != null
                 ? Stack(
@@ -154,7 +166,7 @@ class _ViewAuctionItemsState extends State<ViewAuctionItems>
                 : const LoadingDialog(),
           ),
         ),
-      ),
+  
     );
   }
 }

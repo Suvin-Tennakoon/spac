@@ -2,8 +2,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:spac/models/suvin/AuctionItem.model.dart';
 import 'package:spac/repositories/suvin/AuctionItem.repository.dart';
-import 'package:spac/screens/suvin/view_aucitem_theme.dart';
 import 'package:flutter_countdown_timer/index.dart';
+import 'package:spac/screens/suvin/UpdateAd.dart';
 
 
 //this widget will propogate the list of items by peoplewise
@@ -262,7 +262,15 @@ class _AuctionListViewState extends State<AuctionListView> {
                               borderRadius: const BorderRadius.all(
                                 Radius.circular(32.0),
                               ),
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => UpdateItem(
+                                              itemid: widget.auctionItem!.id,
+                                              auctionitem: widget.auctionItem,
+                                            )));
+                              },
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
