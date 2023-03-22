@@ -14,7 +14,7 @@ void main() async {
   );
 
   runApp(const MaterialApp(
-      home: ViewAllAuctionItems()
+      home: ViewAllAuctionItems(userdata: "Suvin")
   ));
 }
 

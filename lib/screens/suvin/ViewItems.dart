@@ -5,7 +5,6 @@ import 'package:spac/models/suvin/AuctionItem.model.dart';
 import 'package:spac/repositories/suvin/AuctionItem.repository.dart';
 import 'package:spac/screens/suvin/auc_list_view.dart';
 
-
 //this widget will display auction items placed by individual people
 class ViewAuctionItems extends StatefulWidget {
   final String userdata;
@@ -28,7 +27,6 @@ class _ViewAuctionItemsState extends State<ViewAuctionItems>
 
     AuctionItemRepository repo = AuctionItemRepository();
     repo.getAllAuctionItems().then((value) {
-
       List<AuctionItem> localitems = [];
 
       for (AuctionItem ai in value) {
@@ -67,10 +65,9 @@ class _ViewAuctionItemsState extends State<ViewAuctionItems>
     }
 
     setState(() {
-      _auctionItems = items;
+      _auctionItems = localitems;
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -85,92 +82,55 @@ class _ViewAuctionItemsState extends State<ViewAuctionItems>
           ),
           backgroundColor: Color(0xff132137)),
       body: Container(
-          child: Scaffold(
-            body: _auctionItems != null
-                ? Stack(
+        child: Scaffold(
+          body: _auctionItems != null
+              ? SingleChildScrollView(
+                  child: Column(
                     children: <Widget>[
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        onTap: () {
-                          FocusScope.of(context).requestFocus(FocusNode());
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      Text(
+                        "Hello, ${widget.userdata} !!",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: _auctionItems?.length,
+                        padding: const EdgeInsets.only(top: 8),
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (BuildContext context, int index) {
+                          final int count = _auctionItems!.length > 10
+                              ? 10
+                              : _auctionItems!.length;
+                          final Animation<double> animation =
+                              Tween<double>(begin: 0.0, end: 1.0).animate(
+                                  CurvedAnimation(
+                                      parent: animationController!,
+                                      curve: Interval((1 / count) * index, 1.0,
+                                          curve: Curves.fastOutSlowIn)));
+                          animationController?.forward();
+                          return AuctionListView(
+                            callback: _refreshList,
+                            auctionItem: _auctionItems?[index],
+                            animation: animation,
+                            animationController: animationController!,
+                          );
                         },
-                        child: Column(
-                          children: <Widget>[
-                            const SizedBox(
-                              height: 30,
-                            ),
-                            Text(
-                              "Hello, ${widget.userdata} !!",
-                              style: TextStyle(fontSize: 20),
-                            ),
-                            const SizedBox(
-                              height: 30,
-                            ),
-                            Expanded(
-                              child: NestedScrollView(
-                                controller: _scrollController,
-                                headerSliverBuilder: (BuildContext context,
-                                    bool innerBoxIsScrolled) {
-                                  return <Widget>[
-                                    SliverList(
-                                      delegate: SliverChildBuilderDelegate(
-                                          (BuildContext context, int index) {
-                                        return Column(
-                                          children: <Widget>[],
-                                        );
-                                      }, childCount: 1),
-                                    ),
-                                  ];
-                                },
-                                body: Container(
-                                  color: Color(0xffF7EBE1),
-                                  child: ListView.builder(
-                                    itemCount: _auctionItems?.length,
-                                    padding: const EdgeInsets.only(top: 8),
-                                    scrollDirection: Axis.vertical,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      final int count =
-                                          _auctionItems!.length > 10
-                                              ? 10
-                                              : _auctionItems!.length;
-                                      final Animation<double> animation =
-                                          Tween<double>(begin: 0.0, end: 1.0)
-                                              .animate(CurvedAnimation(
-                                                  parent: animationController!,
-                                                  curve: Interval(
-                                                      (1 / count) * index, 1.0,
-                                                      curve: Curves
-                                                          .fastOutSlowIn)));
-                                      animationController?.forward();
-                                      return AuctionListView(
-                                        callback: _refreshList,
-                                        auctionItem: _auctionItems?[index],
-                                        animation: animation,
-                                        animationController:
-                                            animationController!,
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
                       ),
                     ],
-                  )
-                : const LoadingDialog(),
-          ),
+                  ),
+                )
+              : const LoadingDialog(),
         ),
-  
+      ),
     );
   }
 }
-
 
 class LoadingDialog extends StatelessWidget {
   static void show(BuildContext context, {Key? key}) => showDialog<void>(

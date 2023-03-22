@@ -187,7 +187,7 @@ class _UpdateFieldsFormState extends State<UpdateFieldsForm> {
                           Icons.arrow_back_outlined,
                         )),
 
-                    SizedBox(width: 50), // Add spacing between icon and text
+                    SizedBox(width: 80), // Add spacing between icon and text
                     Text('Update Auction'),
                   ],
                 ),

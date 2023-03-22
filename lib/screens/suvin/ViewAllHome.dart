@@ -10,8 +10,8 @@ import 'package:spac/screens/suvin/auc_list_view.dart';
 //this widget will display auction items placed by all the community
 class ViewAllAuctionItems extends StatefulWidget {
   //need to change this to get authenticated mail of the user
-  final String userdata = "Suvin";
-  const ViewAllAuctionItems({super.key});
+  final String userdata;
+  const ViewAllAuctionItems({super.key, required this.userdata});
 
   @override
   State<ViewAllAuctionItems> createState() => _ViewAllAuctionItemsState();
@@ -97,80 +97,48 @@ class _ViewAllAuctionItemsState extends State<ViewAllAuctionItems>
       body: Container(
         child: Scaffold(
           body: _auctionItems != null
-              ? Stack(
-                  children: <Widget>[
-                    InkWell(
-                      splashColor: Colors.transparent,
-                      focusColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
-                      hoverColor: Colors.transparent,
-                      onTap: () {
-                        FocusScope.of(context).requestFocus(FocusNode());
-                      },
-                      child: Column(
-                        children: <Widget>[
-                          const SizedBox(
-                            height: 30,
-                          ),
-                          Text(
-                            "Hello, ${widget.userdata} !!",
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          const SizedBox(
-                            height: 30,
-                          ),
-                          Expanded(
-                            child: NestedScrollView(
-                              controller: _scrollController,
-                              headerSliverBuilder: (BuildContext context,
-                                  bool innerBoxIsScrolled) {
-                                return <Widget>[
-                                  SliverList(
-                                    delegate: SliverChildBuilderDelegate(
-                                        (BuildContext context, int index) {
-                                      return Column(
-                                        children: <Widget>[],
-                                      );
-                                    }, childCount: 1),
-                                  ),
-                                ];
-                              },
-                              body: Container(
-                                color: Color(0xffF7EBE1),
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: _auctionItems?.length,
-                                  padding: const EdgeInsets.only(top: 8),
-                                  scrollDirection: Axis.vertical,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    final int count = _auctionItems!.length > 10
-                                        ? 10
-                                        : _auctionItems!.length;
-                                    final Animation<double> animation =
-                                        Tween<double>(begin: 0.0, end: 1.0)
-                                            .animate(CurvedAnimation(
-                                                parent: animationController!,
-                                                curve: Interval(
-                                                    (1 / count) * index, 1.0,
-                                                    curve:
-                                                        Curves.fastOutSlowIn)));
-                                    animationController?.forward();
-                                    return AuctionListAllView(
-                                      callback: _refreshList,
-                                      auctionItem: _auctionItems?[index],
-                                      animation: animation,
-                                      animationController: animationController!,
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                          )
-                        ],
+              ? SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      const SizedBox(
+                        height: 30,
                       ),
-                    ),
-                  ],
+                      Text(
+                        "Hello, ${widget.userdata} !!",
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: _auctionItems?.length,
+                        padding: const EdgeInsets.only(top: 8),
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (BuildContext context, int index) {
+                          final int count = _auctionItems!.length > 10
+                              ? 10
+                              : _auctionItems!.length;
+                          final Animation<double> animation =
+                              Tween<double>(begin: 0.0, end: 1.0).animate(
+                                  CurvedAnimation(
+                                      parent: animationController!,
+                                      curve: Interval((1 / count) * index, 1.0,
+                                          curve: Curves.fastOutSlowIn)));
+                          animationController?.forward();
+                          return AuctionListAllView(
+                            callback: _refreshList,
+                            auctionItem: _auctionItems?[index],
+                            animation: animation,
+                            animationController: animationController!,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 )
               : const LoadingDialog(),
         ),
