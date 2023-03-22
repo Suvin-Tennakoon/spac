@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:spac/screens/suvin/AddItem.dart';
 
+//used and modified the open source code from
+//https://github.com/mitesh77/Best-Flutter-UI-Templates.git
+// for small portion of the UI Screen
 class IntroductionAnimationScreen extends StatefulWidget {
-
   final String userdata;
 
   const IntroductionAnimationScreen({Key? key, required this.userdata})
@@ -39,8 +41,7 @@ class _IntroductionAnimationScreenState
         child: Center(
           child: ChoiceType(
               animationController: _animationController!,
-              userdata: widget.userdata
-          ),
+              userdata: widget.userdata),
         ),
       ),
     );
@@ -76,7 +77,6 @@ class _ChoiceTypeState extends State<ChoiceType> {
       position: _introductionanimation,
       child: SingleChildScrollView(
         child: Column(
-          
           children: [
             SizedBox(
               width: MediaQuery.of(context).size.width,
@@ -107,14 +107,15 @@ class _ChoiceTypeState extends State<ChoiceType> {
                   bottom: MediaQuery.of(context).padding.bottom + 16),
               child: InkWell(
                 onTap: () {
-                  Navigator.push(context,
+                  Navigator.push(
+                      context,
                       MaterialPageRoute(
                           builder: (context) =>
                               AddItem(userdata: widget.userdata)));
                 },
                 child: Container(
                   height: 58,
-                  padding: EdgeInsets.only(
+                  padding: const EdgeInsets.only(
                     left: 56.0,
                     right: 56.0,
                     top: 16,
@@ -124,7 +125,7 @@ class _ChoiceTypeState extends State<ChoiceType> {
                     borderRadius: BorderRadius.circular(38.0),
                     color: Color(0xff132137),
                   ),
-                  child: Text(
+                  child: const Text(
                     "Let's begin",
                     style: TextStyle(
                       fontSize: 18,

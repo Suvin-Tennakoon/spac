@@ -9,7 +9,6 @@ import 'package:path/path.dart';
 import 'package:spac/models/suvin/AuctionItem.model.dart';
 import 'package:spac/repositories/suvin/AuctionItem.repository.dart';
 import 'package:spac/screens/suvin/ViewItems.dart';
-import 'package:spac/screens/suvin/validator.dart';
 
 //this is the base widget
 //it applies the theme for the inner components
@@ -127,7 +126,6 @@ class _AllFieldsFormState extends State<AllFieldsForm> {
         imageUrls.add(downloadUrl);
       });
     }));
-
 
     // All uploads completed, send items to database with the image URLs
     AuctionItem auctionItem = AuctionItem(

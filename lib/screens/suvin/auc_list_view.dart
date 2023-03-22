@@ -5,7 +5,6 @@ import 'package:spac/repositories/suvin/AuctionItem.repository.dart';
 import 'package:flutter_countdown_timer/index.dart';
 import 'package:spac/screens/suvin/UpdateAd.dart';
 
-
 //this widget will propogate the list of items by peoplewise
 class AuctionListView extends StatefulWidget {
   const AuctionListView(
@@ -41,7 +40,6 @@ class _AuctionListViewState extends State<AuctionListView> {
                   left: 24, right: 24, top: 8, bottom: 16),
               child: InkWell(
                 splashColor: Colors.transparent,
-                
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.all(Radius.circular(16.0)),
@@ -300,7 +298,6 @@ class _AuctionListViewState extends State<AuctionListView> {
     );
   }
 }
-
 
 class LoadingDialog extends StatelessWidget {
   static void show(BuildContext context, {Key? key}) => showDialog<void>(

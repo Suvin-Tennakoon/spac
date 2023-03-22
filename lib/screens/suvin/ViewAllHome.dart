@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:spac/models/suvin/AuctionItem.model.dart';
 import 'package:spac/repositories/suvin/AuctionItem.repository.dart';
 import 'package:spac/screens/suvin/ChoiceType.dart';
 import 'package:spac/screens/suvin/auc_list_all.dart';
-import 'package:spac/screens/suvin/auc_list_view.dart';
 
 //this widget will display auction items placed by all the community
 class ViewAllAuctionItems extends StatefulWidget {

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 
+//extracted and modified the code from original
+//image_picker flutter pub library documentation
+
+//https://pub.dev/packages/image_picker/example
 class MyImagePicker extends StatefulWidget {
   const MyImagePicker({super.key});
 

@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:spac/screens/suvin/AddToDo.dart';
-import 'package:spac/screens/suvin/ChoiceType.dart';
-import 'package:spac/screens/suvin/ImagePicker.dart';
 import 'package:spac/screens/suvin/ViewAllHome.dart';
-import 'package:spac/screens/suvin/ViewItems.dart';
 import 'firebase_options.dart';
 
 void main() async {
