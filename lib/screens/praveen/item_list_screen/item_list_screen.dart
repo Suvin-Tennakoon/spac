@@ -16,39 +16,39 @@ class ItemListScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Items',
+          'Bidding Items',
         ),
         centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: ListView.separated(
-          physics: const BouncingScrollPhysics(),
-          separatorBuilder: (context, index) {
-            return const Divider(
-              height: 50.0,
-            );
-          },
-          itemCount: 5,
-          itemBuilder: (context, index) {
-            return ItemCard(
-              onGotoCommentList: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CommentList()));
-              },
-              onLiked: () {},
-              onCommentTap: () {},
-              onDisliked: () {},
-              comment1: const CommentBox(
-                image: 'assets/praveen/img1.jpg',
-                comment: 'Lorem ipsum dolar amet....',
-              ),
-              comment2: const CommentBox(
-                image: 'assets/praveen/img1.jpg',
-                comment: 'Lorem ipsum dolar amet....',
-              ),
-            );
-          }
-        ),
+            physics: const BouncingScrollPhysics(),
+            separatorBuilder: (context, index) {
+              return const Divider(
+                height: 50.0,
+              );
+            },
+            itemCount: 5,
+            itemBuilder: (context, index) {
+              return ItemCard(
+                onGotoCommentList: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const CommentList()));
+                },
+                onLiked: () {},
+                onCommentTap: () {},
+                onDisliked: () {},
+                comment1: const CommentBox(
+                  image: 'assets/praveen/img1.jpg',
+                  comment: 'Lorem ipsum dolar amet....',
+                ),
+                comment2: const CommentBox(
+                  image: 'assets/praveen/img1.jpg',
+                  comment: 'Lorem ipsum dolar amet....',
+                ),
+              );
+            }),
       ),
     );
   }

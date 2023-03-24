@@ -24,7 +24,6 @@ class CommentList extends StatelessWidget {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
-
               Expanded(
                 child: ListView.separated(
                   physics: const BouncingScrollPhysics(),
@@ -43,16 +42,14 @@ class CommentList extends StatelessWidget {
                   },
                 ),
               ),
-
               const SizedBox(
                 height: 20.0,
               ),
-
               TextField(
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                 ),
-                obscureText: true,
+                obscureText: false,
                 decoration: InputDecoration(
                   hintText: 'Enter your comment...',
                   filled: true,
@@ -65,13 +62,10 @@ class CommentList extends StatelessWidget {
                   ),
                 ),
               ),
-
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
-                  onPressed: () {},
-                  child: const Text('Add Comment')
-                ),
+                    onPressed: () {}, child: const Text('Add Comment')),
               )
             ],
           ),
