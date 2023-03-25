@@ -31,30 +31,24 @@ class CommentBox extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-
           const SizedBox(
             width: 10.0,
           ),
-
           Text(
             comment,
             style: const TextStyle(
               fontSize: 16.0,
             ),
           ),
-
           const Spacer(),
-
           if (isOwnComment) ...[
+            IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
             IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.edit)
-            ),
-
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.delete, color: Colors.red,)
-            ),
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.delete,
+                  color: Colors.red,
+                )),
           ]
         ],
       ),

@@ -1,10 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:spac/models/praveen/comment.dart';
+import 'package:spac/repositories/praveen/CommentRepository.dart';
 import 'package:spac/screens/praveen/components/comment_box.dart';
 
-class CommentList extends StatelessWidget {
+class CommentList extends StatefulWidget {
   const CommentList({super.key});
+
+  @override
+  State<CommentList> createState() => _CommentListState();
+}
+
+class _CommentListState extends State<CommentList> {
+  List<CommentModel> _comments = [];
+  final CommentRepository _auth = CommentRepository();
+  late String _comment = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchComments();
+  }
+
+  void _fetchComments() async {
+    List<CommentModel> comments = await CommentRepository().comments();
+    setState(() {
+      _comments = comments;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,16 +51,18 @@ class CommentList extends StatelessWidget {
               Expanded(
                 child: ListView.separated(
                   physics: const BouncingScrollPhysics(),
-                  itemCount: 10,
+                  itemCount: _comments.length,
                   separatorBuilder: (context, index) {
                     return const SizedBox(
                       height: 5.0,
                     );
                   },
                   itemBuilder: (context, index) {
+                    CommentModel commentModel = _comments[index];
+
                     return CommentBox(
                       image: 'assets/praveen/img1.jpg',
-                      comment: "This is comment ${index + 1}",
+                      comment: commentModel.comment,
                       isOwnComment: index % 2 == 0,
                     );
                   },
@@ -61,11 +87,26 @@ class CommentList extends StatelessWidget {
                     horizontal: 15.0,
                   ),
                 ),
+                onChanged: (value) {
+                  setState(() {
+                    _comment = value;
+                  });
+                },
               ),
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
-                    onPressed: () {}, child: const Text('Add Comment')),
+                    onPressed: () {
+                      CommentModel student = CommentModel(
+                        comment: _comment,
+                      );
+                      CommentRepository commentRepository = CommentRepository();
+                      commentRepository.addComment(student);
+                      setState(() {
+                        _comment = '';
+                      });
+                    },
+                    child: const Text('Add Comment')),
               )
             ],
           ),
