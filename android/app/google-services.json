@@ -29,6 +29,13 @@
             {
               "client_id": "914953000657-2jahhlp3rri3pe4ets54dp3n748pmbg7.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "914953000657-1g1066m31mqbrrh58kspje4bo53o9qod.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.spac"
+              }
             }
           ]
         }
