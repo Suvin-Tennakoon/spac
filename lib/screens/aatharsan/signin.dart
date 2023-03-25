@@ -1,5 +1,6 @@
 import 'package:spac/home.dart';
 import 'package:spac/screens/aatharsan/signup.dart';
+import 'package:spac/screens/praveen/item_list_screen/item_list_screen.dart';
 import 'package:spac/services/authenthication.dart';
 import 'package:spac/services/validfunctions.dart';
 import 'package:flutter/material.dart';
@@ -118,9 +119,11 @@ class _SignInState extends State<SignIn> {
                                       backgroundColor: Colors.blue,
                                     ));
                                     Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (_) => const Main()));
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              ItemListScreen()),
+                                    );
                                   } else {
                                     setState(() {
                                       isLoading = false;

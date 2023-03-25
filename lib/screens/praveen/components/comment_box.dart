@@ -23,6 +23,7 @@ class CommentBox extends StatefulWidget {
 
 class _CommentBoxState extends State<CommentBox> {
   List<CommentModel> _comments = [];
+  final TextEditingController _commentController = TextEditingController();
 
   @override
   void initState() {
@@ -35,6 +36,53 @@ class _CommentBoxState extends State<CommentBox> {
     setState(() {
       _comments = comments;
     });
+  }
+
+  void _update(CommentModel commentModel) async {
+    _commentController.text = commentModel.comment;
+    String uid = commentModel.uid;
+
+    await showModalBottomSheet(
+        isScrollControlled: true,
+        context: context,
+        builder: (BuildContext ctx) {
+          return Padding(
+            padding: EdgeInsets.only(
+                top: 20,
+                left: 20,
+                right: 20,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: _commentController,
+                  decoration: const InputDecoration(labelText: 'Comment'),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                ElevatedButton(
+                  child: const Text('Update'),
+                  onPressed: () async {
+                    commentModel.comment = _commentController.text;
+                    CommentRepository commentRepository = CommentRepository();
+
+                    print(commentModel.comment);
+                    commentRepository.updateComment(commentModel);
+
+                    Navigator.of(context).pop();
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(builder: (context) => CommentList()),
+                    // );
+                  },
+                )
+              ],
+            ),
+          );
+        });
   }
 
   @override
@@ -67,7 +115,17 @@ class _CommentBoxState extends State<CommentBox> {
           ),
           const Spacer(),
           if (widget.isOwnComment) ...[
-            IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
+            IconButton(
+                onPressed: () {
+                  print('first update point');
+                  print(widget.uid);
+                  print(widget.comment);
+                  CommentModel commentModel =
+                      CommentModel(comment: widget.comment, uid: widget.uid);
+
+                  _update(commentModel);
+                },
+                icon: const Icon(Icons.edit)),
             IconButton(
                 onPressed: () {
                   print(widget.uid);

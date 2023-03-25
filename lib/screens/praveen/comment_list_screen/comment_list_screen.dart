@@ -6,7 +6,12 @@ import 'package:spac/repositories/praveen/CommentRepository.dart';
 import 'package:spac/screens/praveen/components/comment_box.dart';
 
 class CommentList extends StatefulWidget {
-  const CommentList({super.key});
+  const CommentList({
+    super.key,
+    this.updateCommentWidget,
+  });
+
+  final Widget? updateCommentWidget;
 
   @override
   State<CommentList> createState() => _CommentListState();
@@ -59,12 +64,13 @@ class _CommentListState extends State<CommentList> {
                   },
                   itemBuilder: (context, index) {
                     CommentModel commentModel = _comments[index];
+                    String profileImg = 'assets/praveen/img${index + 1}.jpg';
 
                     return CommentBox(
                       uid: commentModel.uid,
-                      image: 'assets/praveen/img1.jpg',
+                      image: profileImg,
                       comment: commentModel.comment,
-                      isOwnComment: index % 2 == 0,
+                      isOwnComment: index % 3 == 0,
                     );
                   },
                 ),
