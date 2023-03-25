@@ -5,7 +5,7 @@ class CommentModel {
   String? itemId;
   String? userId;
   Timestamp? createdAt;
-  String? uid;
+  String uid;
 
   //Receiving Data
   CommentModel(
@@ -13,7 +13,7 @@ class CommentModel {
       this.itemId,
       this.userId,
       this.createdAt,
-      this.uid});
+      required this.uid});
 
   factory CommentModel.fromMap(map) {
     return CommentModel(

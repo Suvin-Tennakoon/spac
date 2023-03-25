@@ -35,7 +35,11 @@ class CommentRepository {
   }
 
   Future<void> addComment(CommentModel comment) {
-    return _collection.add(comment.toMap());
+    comment.uid = uuid.v1();
+    comment.itemId = "item1";
+    comment.userId = "user3";
+    return _collection.doc(comment.uid).set(comment.toMap());
+    // return _collection.add(comment.toMap());
   }
 
   Future<void> updateComment(CommentModel comment) {

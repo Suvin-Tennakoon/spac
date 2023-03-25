@@ -61,6 +61,7 @@ class _CommentListState extends State<CommentList> {
                     CommentModel commentModel = _comments[index];
 
                     return CommentBox(
+                      uid: commentModel.uid,
                       image: 'assets/praveen/img1.jpg',
                       comment: commentModel.comment,
                       isOwnComment: index % 2 == 0,
@@ -97,14 +98,11 @@ class _CommentListState extends State<CommentList> {
                 width: double.infinity,
                 child: FilledButton(
                     onPressed: () {
-                      CommentModel student = CommentModel(
-                        comment: _comment,
-                      );
+                      CommentModel comment =
+                          CommentModel(comment: _comment, uid: "");
                       CommentRepository commentRepository = CommentRepository();
-                      commentRepository.addComment(student);
-                      setState(() {
-                        _comment = '';
-                      });
+                      commentRepository.addComment(comment);
+                      _fetchComments();
                     },
                     child: const Text('Add Comment')),
               )
