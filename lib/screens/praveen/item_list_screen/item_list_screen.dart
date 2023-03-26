@@ -56,8 +56,8 @@ class _ItemListScreenState extends State<ItemListScreen> {
               String imageURL = 'assets/praveen/item${index + 1}.jpg';
               print(imageURL);
 
-              CommentModel commentModel1 = _comments[1];
-              CommentModel commentModel2 = _comments[2];
+              CommentModel commentModel1 = _comments[0];
+              CommentModel commentModel2 = _comments[1];
 
               int commentCount = _comments.length;
 

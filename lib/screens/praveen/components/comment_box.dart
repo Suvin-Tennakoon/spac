@@ -24,9 +24,16 @@ class CommentBox extends StatefulWidget {
 class _CommentBoxState extends State<CommentBox> {
   List<CommentModel> _comments = [];
   final TextEditingController _commentController = TextEditingController();
+  bool isLoading = false;
 
   @override
   void initState() {
+    isLoading = true;
+
+    setState(() {
+      isLoading = false;
+    });
+
     super.initState();
     _fetchComments();
   }
@@ -66,13 +73,40 @@ class _CommentBoxState extends State<CommentBox> {
                 ElevatedButton(
                   child: const Text('Update'),
                   onPressed: () async {
+                    LoadingDialog.show(context);
+
                     commentModel.comment = _commentController.text;
                     CommentRepository commentRepository = CommentRepository();
 
                     print(commentModel.comment);
-                    commentRepository.updateComment(commentModel);
 
-                    Navigator.of(context).pop();
+                    dynamic result =
+                        await commentRepository.updateComment(commentModel);
+
+                    print(result);
+                    if (result == 'Success') {
+                      setState(() {
+                        isLoading = false;
+                      });
+                      Navigator.of(context).pop();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => CommentList()),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        behavior: SnackBarBehavior.floating,
+                        margin: EdgeInsets.only(bottom: 100.0),
+                        content: new Text("Comment Updated"),
+                        dismissDirection: DismissDirection.none,
+                        backgroundColor: Color.fromARGB(255, 22, 8, 222),
+                      ));
+                    } else {
+                      setState(() {
+                        isLoading = false;
+                      });
+                      print('Error');
+                    }
+
                     // Navigator.push(
                     //   context,
                     //   MaterialPageRoute(builder: (context) => CommentList()),
@@ -117,7 +151,6 @@ class _CommentBoxState extends State<CommentBox> {
           if (widget.isOwnComment) ...[
             IconButton(
                 onPressed: () {
-                  print('first update point');
                   print(widget.uid);
                   print(widget.comment);
                   CommentModel commentModel =
@@ -127,17 +160,80 @@ class _CommentBoxState extends State<CommentBox> {
                 },
                 icon: const Icon(Icons.edit)),
             IconButton(
-                onPressed: () {
+                // onPressed: () {
+                // print(widget.uid);
+                // print(widget.comment);
+                // CommentModel commentModel =
+                //     CommentModel(comment: widget.comment, uid: widget.uid);
+                // CommentRepository commentRepository = CommentRepository();
+                // commentRepository.deleteComment(commentModel);
+
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => CommentList()),
+                // );
+                // },
+                onPressed: () async {
                   print(widget.uid);
                   print(widget.comment);
                   CommentModel commentModel =
                       CommentModel(comment: widget.comment, uid: widget.uid);
                   CommentRepository commentRepository = CommentRepository();
-                  commentRepository.deleteComment(commentModel);
 
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => CommentList()),
+                  showDialog<String>(
+                    context: context,
+                    builder: (BuildContext contextF) => AlertDialog(
+                      title: const Text('Delete Comment'),
+                      content: const Text(
+                          "Are you sure that you want to permanently remove this comment ?"),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () => Navigator.pop(contextF, 'Cancel'),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            LoadingDialog.show(context);
+                            setState(() {
+                              isLoading = true;
+                            });
+                            Navigator.pop(contextF, 'Yes');
+                            dynamic result = await commentRepository
+                                .deleteComment(commentModel);
+                            ;
+                            print(result);
+                            if (result == 'Success') {
+                              setState(() {
+                                isLoading = false;
+                              });
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => CommentList()),
+                              );
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                behavior: SnackBarBehavior.floating,
+                                margin: EdgeInsets.only(bottom: 100.0),
+                                content: new Text("Comment Deleted"),
+                                dismissDirection: DismissDirection.none,
+                                backgroundColor:
+                                    Color.fromARGB(255, 235, 136, 129),
+                              ));
+                            } else {
+                              setState(() {
+                                isLoading = false;
+                              });
+                              print('Error');
+                            }
+                          },
+                          child: const Text(
+                            'Delete',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      ],
+                    ),
                   );
                 },
                 icon: const Icon(
@@ -146,6 +242,54 @@ class _CommentBoxState extends State<CommentBox> {
                 )),
           ]
         ],
+      ),
+    );
+  }
+}
+
+class LoadingDialog extends StatelessWidget {
+  static void show(BuildContext context, {Key? key}) => showDialog<void>(
+        context: context,
+        useRootNavigator: false,
+        barrierDismissible: false,
+        builder: (_) => LoadingDialog(key: key),
+      ).then((_) => FocusScope.of(context).requestFocus(FocusNode()));
+
+  static void hide(BuildContext context) => Navigator.pop(context);
+
+  const LoadingDialog({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Center(
+        child: Card(
+          child: Container(
+            width: 150,
+            height: 130,
+            padding: const EdgeInsets.all(12.0),
+            child: Center(
+              child: Column(
+                children: const [
+                  CircularProgressIndicator(
+                    color: Colors.green,
+                  ),
+                  SizedBox(
+                    height: 15.0,
+                  ),
+                  Text(
+                    "Working on your action...",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 34, 57, 139)),
+                    textAlign: TextAlign.center,
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

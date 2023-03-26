@@ -7,7 +7,7 @@ class CommentModel {
   Timestamp? createdAt;
   String uid;
 
-  //Receiving Data
+  //Retreiving Data
   CommentModel(
       {required this.comment,
       this.itemId,

@@ -19,7 +19,7 @@ class CommentRepository {
   Future<List<CommentModel>> comments() async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
-          await _fireStore.collection('comments').get();
+          await _fireStore.collection('comments').orderBy('createdAt').get();
 
       List<CommentModel> comments = [];
       querySnapshot.docs.forEach((doc) {
@@ -34,19 +34,41 @@ class CommentRepository {
     }
   }
 
-  Future<void> addComment(CommentModel comment) {
+  Future addComment(CommentModel comment) async {
     comment.uid = uuid.v1();
     comment.itemId = "item1";
     comment.userId = "user3";
-    return _collection.doc(comment.uid).set(comment.toMap());
+    try {
+      await _collection.doc(comment.uid).set(comment.toMap());
+
+      return 'Success';
+    } on FirebaseAuthException catch (e) {
+      print(e);
+      return null;
+    }
+
     // return _collection.add(comment.toMap());
   }
 
-  Future<void> updateComment(CommentModel comment) {
-    return _collection.doc(comment.uid).update(comment.toMap());
+  Future updateComment(CommentModel comment) async {
+    try {
+      await _collection.doc(comment.uid).update(comment.toMap());
+
+      return 'Success';
+    } on FirebaseAuthException catch (e) {
+      print(e);
+      return null;
+    }
   }
 
-  Future<void> deleteComment(CommentModel comment) {
-    return _collection.doc(comment.uid).delete();
+  Future deleteComment(CommentModel comment) async {
+    try {
+      await _collection.doc(comment.uid).delete();
+
+      return 'Success';
+    } on FirebaseAuthException catch (e) {
+      print(e);
+      return null;
+    }
   }
 }
