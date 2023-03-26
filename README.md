@@ -1,16 +1,23 @@
-# spac
+# SPAC
+## Group ID : 83
 
-A new Flutter project.
+A `Flutter` project.
 
-## Getting Started
+## This is an Auction Management Application.
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Getting Started
+There are 4 main components:
+  - User Management
+  - Listing Management
+  - Bidding Management
+  - Comment/Review Management
+  
+  
+**Member Details :**
+| Name | Student ID | Username | Function |
+|--|--|--|--|
+| Member 01 | IT20407384 | Tennakoon H.P.S.M. | Listing Management |
+| Member 02 | IT20272586 | Peiris T.P.D. | Comment/Review Management |
+| Member 03 | IT20203894 | Rathnayake L.N.K.C. | Bidding Management |
+| Member 04 | IT20073596 | Aatharsan B. | User Management |
